@@ -1,0 +1,54 @@
+Assignment 1.6
+
+01.
+
+SELECT 
+  dates_rollup.Date,
+  COALESCE(SUM(daily_orders.orders),0)         AS orders,
+  COALESCE(SUM(daily_orders.item_orders),0)    AS item_orders
+FROM 
+  dsv1069.dates_rollup
+LEFT JOIN
+    (
+    SELECT 
+      DATE(created_at)                         AS Day,
+      COUNT(DISTINCT(item_id))                 AS orders,
+      COUNT(DISTINCT(line_item_id))            AS item_orders
+    FROM
+      dsv1069.orders
+    GROUP BY
+      DATE(created_at)
+      ) daily_orders
+    ON 
+       daily_orders.Day= dates_rollup.Date
+GROUP BY 
+  dates_rollup.Date
+
+02
+
+SELECT 
+  dates_rollup.Date,
+  COALESCE(SUM(daily_orders.orders),0)         AS orders,
+  COALESCE(SUM(daily_orders.item_orders),0)    AS item_orders,
+  COUNT(*)                                     AS row_count
+FROM 
+  dsv1069.dates_rollup
+LEFT JOIN
+    (
+    SELECT 
+      DATE(created_at)                         AS Day,
+      COUNT(DISTINCT(item_id))                 AS orders,
+      COUNT(DISTINCT(line_item_id))            AS item_orders
+    FROM
+      dsv1069.orders
+    GROUP BY
+      DATE(created_at)
+      ) daily_orders
+ON 
+      dates_rollup.Date   >= daily_orders.Day 
+AND 
+      dates_rollup.d7_ago < daily_orders.Day
+   
+GROUP BY
+  dates_rollup.Date
+   
