@@ -1,0 +1,90 @@
+SQL - Assignment 1.5
+
+1.
+
+SELECT 
+  date(created_at) AS Day,
+  count (*) AS User
+FROM 
+  dsv1069.users
+GROUP BY
+   date(created_at)
+
+2.
+
+SELECT 
+  date(created_at) AS Date,
+  count (*) AS User
+FROM 
+  dsv1069.users
+WHERE
+  deleted_at IS NULL
+AND
+  (id <> parent_user_id OR  parent_user_id ISNULL) 
+GROUP BY
+   date(created_at)
+
+3.
+
+SELECT 
+ DATE(deleted_at) AS DATE,
+ COUNT(*) AS Deleted_users
+FROM 
+ dsv1069.users
+WHERE
+ deleted_at IS NOT NULL
+GROUP BY
+ DATE(deleted_at)
+
+4.
+
+SELECT 
+ New_users.Day,
+ New_users.User,
+ Deleted_user.Deleted_users,
+ Merged.Merged_user
+FROM  
+   (
+    SELECT 
+      date(created_at) AS Day,
+      count (*) AS User
+    FROM 
+      dsv1069.users
+    GROUP BY
+       date(created_at)
+    ) New_users
+LEFT JOIN 
+    (
+    SELECT 
+     DATE(deleted_at) AS Day,
+     COUNT(*) AS Deleted_users
+    FROM 
+     dsv1069.users
+    WHERE
+     deleted_at IS NOT NULL
+    GROUP BY
+     DATE(deleted_at)
+    ) Deleted_user
+ON 
+  New_users.Day=Deleted_user.Day
+LEFT JOIN 
+    ( 
+     SELECT 
+     date(merged_at) AS Day,
+     count (*) AS Merged_user
+     FROM 
+     dsv1069.users
+     WHERE
+     id <> parent_user_id 
+     AND 
+     parent_user_id IS NOT NULL
+     GROUP BY
+     date(merged_at) 
+     ) Merged
+ON 
+  New_users.Day=Merged.Day
+
+
+  	
+
+
